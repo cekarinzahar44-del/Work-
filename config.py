@@ -40,10 +40,10 @@ class Config:
     db_user: str
     db_password: str
 
-    # Telegram User API (для чтения канала)
-    telegram_api_id: int
-    telegram_api_hash: str
-    telegram_phone: str
+    # Telegram User API (для чтения канала) — опционально, нужно только если включён telegram_parser
+    telegram_api_id: int | None
+    telegram_api_hash: str | None
+    telegram_phone: str | None
     freelance_channel: str
 
     # Параметры поиска
@@ -75,9 +75,9 @@ def load_config() -> Config:
         db_name=_get_str("DB_NAME", default="job_search_bot"),
         db_user=_get_str("DB_USER", default="postgres"),
         db_password=_get_str("DB_PASSWORD"),
-        telegram_api_id=_get_int("TELEGRAM_API_ID"),
-        telegram_api_hash=_get_str("TELEGRAM_API_HASH"),
-        telegram_phone=_get_str("TELEGRAM_PHONE"),
+        telegram_api_id=_get_int("TELEGRAM_API_ID", default=0) or None,
+        telegram_api_hash=_get_str("TELEGRAM_API_HASH", required=False) or None,
+        telegram_phone=_get_str("TELEGRAM_PHONE", required=False) or None,
         freelance_channel=_get_str("FREELANCE_CHANNEL", default="freelansim_ru"),
         min_salary=_get_int("MIN_SALARY", default=100000),
         check_interval_minutes=_get_int("CHECK_INTERVAL_MINUTES", default=10),
