@@ -96,17 +96,22 @@ async def run_all_parsers():
     except Exception as e:
         logger.error(f"Ошибка rabota_parser: {e}")
 
-    # IT-направление (второстепенное)
-    try:
-        for vac in await fetch_telegram_vacancies(
-            config.telegram_api_id,
-            config.telegram_api_hash,
-            config.telegram_phone,
-            config.freelance_channel,
-        ):
-            await storage.save_vacancy(vac)
-    except Exception as e:
-        logger.error(f"Ошибка telegram_parser: {e}")
+    # IT-направление (второстепенное) — включится автоматически, как только
+    # будут заданы TELEGRAM_API_ID / TELEGRAM_API_HASH / TELEGRAM_PHONE.
+    # Пока эти переменные не заданы — блок просто пропускается.
+    if config.telegram_api_id and config.telegram_api_hash and config.telegram_phone:
+        try:
+            for vac in await fetch_telegram_vacancies(
+                config.telegram_api_id,
+                config.telegram_api_hash,
+                config.telegram_phone,
+                config.freelance_channel,
+            ):
+                await storage.save_vacancy(vac)
+        except Exception as e:
+            logger.error(f"Ошибка telegram_parser: {e}")
+    else:
+        logger.info("Telegram parser пропущен: TELEGRAM_API_ID/HASH/PHONE не заданы")
 
     logger.info("Цикл парсинга завершён, рассылаю новые вакансии...")
     await send_pending_vacancies()
