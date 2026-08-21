@@ -7,6 +7,7 @@ import asyncio
 import logging
 
 from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
@@ -23,7 +24,7 @@ logger = logging.getLogger("job_search_bot")
 
 config = load_config()
 storage = Storage(config.db_dsn)
-bot = Bot(token=config.bot_token, parse_mode=ParseMode.HTML)
+bot = Bot(token=config.bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher()
 
 
@@ -60,7 +61,6 @@ async def send_pending_vacancies():
                     chat_id=config.target_chat_id,
                     message_thread_id=topic_id,
                     text=format_vacancy_message(row),
-                    disable_web_page_preview=False,
                 )
                 await storage.mark_sent(row["id"])
             except Exception as e:
